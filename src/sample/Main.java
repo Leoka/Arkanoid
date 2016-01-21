@@ -1,37 +1,65 @@
 package sample;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.scene.Group;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.FontPosture;
-import javafx.scene.image.Image;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
+import javafx.scene.layout.Pane;
+import javafx.scene.shape.Circle;
+import javafx.util.Duration;
 
 public class Main extends Application {
+    public static Circle circle;
+    public static Pane canvas;
 
     @Override
     public void start(Stage theStage) throws Exception{
-        theStage.setTitle( "Arkanoid" );
+        canvas = new Pane();
+        final Scene scene = new Scene(canvas, 800, 600);
 
-        Group root = new Group();
-        Scene theScene = new Scene( root );
-        theStage.setScene( theScene );
+        theStage.setTitle("Arkanoid");
+        theStage.setScene(scene);
 
-        Canvas canvas = new Canvas( 720, 640 );
-        root.getChildren().add( canvas );
+        circle = new Circle( 15, Color.RED );
+        circle.relocate( 100, 100 );
 
-        GraphicsContext gc = canvas.getGraphicsContext2D();
+        canvas.getChildren().addAll( circle );
 
         theStage.show();
     }
+    final Timeline loop = new Timeline(new KeyFrame(Duration.millis(10), new EventHandler<ActionEvent>() {
 
+        double deltaX = 3;
+        double deltaY = 3;
+
+        @Override
+        public void handle(final ActionEvent t) {
+            circle.setLayoutX(circle.getLayoutX() + deltaX);
+            circle.setLayoutY(circle.getLayoutY() + deltaY);
+
+            final Bounds bounds = canvas.getBoundsInLocal();
+            final boolean atRightBorder = circle.getLayoutX() >= (bounds.getMaxX() - circle.getRadius());
+            final boolean atLeftBorder = circle.getLayoutX() <= (bounds.getMinX() + circle.getRadius());
+            final boolean atBottomBorder = circle.getLayoutY() >= (bounds.getMaxY() - circle.getRadius());
+            final boolean atTopBorder = circle.getLayoutY() <= (bounds.getMinY() + circle.getRadius());
+
+            if (atRightBorder || atLeftBorder) {
+                deltaX *= -1;
+            }
+            if (atBottomBorder || atTopBorder) {
+                deltaY *= -1;
+            }
+        }
+    }));
+
+    loop.setCycleCount(Timeline.INDEFINITE);
+    loop.play();
+}
 
     public static void main(String[] args) {
         launch(args);
