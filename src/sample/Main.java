@@ -57,7 +57,7 @@ public class Main extends Application {
         }
     }));
 
-    loop.setCycleCount(Timeline.INDEFINITE);
+    //loop.setCycleCount(Timeline.INDEFINITE);
     loop.play();
 }
 
